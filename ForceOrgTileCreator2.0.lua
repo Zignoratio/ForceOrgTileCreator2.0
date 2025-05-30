@@ -28,7 +28,7 @@ cardFront = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399045823/C53
 cardBack = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399277771/F36A07139E1E971F5F62C5C5F22677FECFDBE1FB/" -- Black background
 
 -- Put any GUID here you want ignored. This is also passed to the created tile.
-PROTECTED =
+IGNORED =
 {
     "e7ca6e", --Exclude Models Buidler Table
     "6012bf", --...and ForceOrg Table...
@@ -52,9 +52,9 @@ function saveModels(player)
     DROP_OFF = self.getPosition() + Vector(0, 0, 12)  -- Just using offsets now
 
     -- Easier to filter donig this also, making a new filtered list also
-    local PROTECTED_SET = {}
-    for _, guid in ipairs(PROTECTED) do
-        PROTECTED_SET[guid] = true
+    local IGNORED_SET = {}
+    for _, guid in ipairs(IGNORED) do
+        IGNORED_SET[guid] = true
     end
 
     local filtered_objects = {}
@@ -114,7 +114,7 @@ function saveModels(player)
     Wait.condition(
         function()
             for _, obj in ipairs(objects) do
-                if not PROTECTED_SET[obj.guid] then
+                if not IGNORED_SET[obj.guid] then
                     table.insert(filtered_objects, obj)
                 end
             end
@@ -211,7 +211,7 @@ function saveModels(player)
             local TileCustom = spawnObjectData({data = TileData})-- Spawn the Tile thats prepared in the getTileData() function
             TileCustom.setPosition(Tile_position) -- Set the position of the Tile to the Tile position we set up above
             TileCustom.setRotation({0, TILE_ROTATION, 0}) --^
-            Wait.time(function()TileCustom.call("setProtectedTable", {table = PROTECTED}) end,.2)
+            Wait.time(function()TileCustom.call("setProtectedTable", {table = IGNORED}) end,.2)
 
         end,
         function()
@@ -239,15 +239,15 @@ function getTileData() -- This fuction prepares the Models Tile data.
             }
         },
         LuaScript = [[
-    PROTECTED = {
+    IGNORED = {
             }
     objects = nil
 
-PROTECTED = {}
+IGNORED = {}
 
     -- sets protected objects from the creator
     function setProtectedTable(params)
-        PROTECTED = params.table
+        IGNORED = params.table
     end
 
     function onLoad()
@@ -305,9 +305,9 @@ PROTECTED = {}
         -------------------
 
         -- Easier to filter donig this also, making a new filtered list also
-        local PROTECTED_SET = {}
-        for _, guid in ipairs(PROTECTED) do
-            PROTECTED_SET[guid] = true
+        local IGNORED_SET = {}
+        for _, guid in ipairs(IGNORED) do
+            IGNORED_SET[guid] = true
         end
 
         local filtered_objects = {}
@@ -365,7 +365,7 @@ PROTECTED = {}
         Wait.condition(
             function()
                 for _, obj in ipairs(objects) do
-                    if not PROTECTED_SET[obj.guid] then
+                    if not IGNORED_SET[obj.guid] then
                         table.insert(filtered_objects, obj)
                     end
                 end
