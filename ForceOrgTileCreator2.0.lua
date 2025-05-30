@@ -1,5 +1,5 @@
 --[[
-ForceOrg Tile Creator Tool 2.0
+ForceOrg Tile Creator Tool 1.3
 
 By Raikoh and Bone White
 Updated by Ziggy Stardust
@@ -19,6 +19,9 @@ For more information and variants of this tool, reach out to Raikoh067 on Discor
 IS_LOCKED = true
 SPAWNED_CARD_SCALE = 6.72 -- ForceOrg Default
 TILE_ROTATION = 180 -- ForceOrg Default
+
+-- Zone Settings
+
 
 -- Set default tile art. Default is Space Marine with back.
 cardFront = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399045823/C53CF78B3F4A81500D458DD9A45F8F262ABC6409/" -- Default space marine
@@ -168,7 +171,7 @@ function saveModels(player)
             
             ------------------
             -- Spawn the Tile
-
+            
             local my_position = self.getPosition()-- Create a position for the Models Tile to spawn, offset from the location of the button. (no longer used )
             local Tile_position = UPDATE_TARGET
 
@@ -379,6 +382,9 @@ PROTECTED = {}
                 for i, obj in ipairs(filtered_objects) do
                     obj.destruct()
                     if i == #filtered_objects then step5 = true end
+                end
+                if #filtered_objects == 0 then
+                    step5 = true
                 end    
             end,
             function()
@@ -387,7 +393,7 @@ PROTECTED = {}
         )
         
         --step6
-        Wait.condition(function() zone.destruct() step6 = true end, function() return step5 == true end)
+        Wait.condition(function() zone.destruct() step6 = true end, function() return step5 == true end, 20)
 
         Wait.condition(
             function()
