@@ -1,27 +1,40 @@
-<!--  -->
-<Button
-    id="createButton"
-    visibility = ""
-    color = "Green"
-    onClick="saveModels"
-    text="Save"
-    fontSize="80"
-    width="230"
-    height="100"
-    position="0 -70 -20"
-    scale=".5 .5 .5"
-    rotation="0 0 180"
-/>
+<Panel visibility="" color="" position="0 -110 -25" height="150" width="250" rotation= "0 0 180" offsetxy="0 0" active="true" scale="0.5 0.5 .5" >
+  <VerticalLayout>
+    <Text position="0 0 0" id="panelSaveText" active="False" color="#006400" fontSize="90" fontStyle="Bold" alignment="MiddleCenter" text="SAVE"/>
+  </VerticalLayout>
+</Panel>
+<Panel visibility="" color="" position="0 0 -25" height="200" width="160" rotation= "0 0 0" offsetxy="0 0" active="true">
+    <Button
+        id="xmlSaveButton"
+        color=""
+        active="False"
+        onClick="saveModels">
+    </Button>
+</Panel>
 
-<Button
-    id="setupButton"
-    visibility = ""
-    color = "Red"
-    onClick="showSetup"
-    text="Setup"
-    fontSize="30"
-    width="120"
-    height="60"
-    position="0 60 -25"
-    rotation="0 0 180"
-/>
+<Panel visibility="" color="" position="0 -110 -25" height="150" width="250" rotation= "0 0 180" offsetxy="0 0" active="true" scale="0.5 0.5 0.5" >
+  <VerticalLayout>
+    <Text position="0 0 0" id="panelSetupText" active="False" color="#8B0000" fontSize="55" fontStyle="Bold" alignment="MiddleCenter" text="SETUP"/>
+  </VerticalLayout>
+</Panel>
+<Panel visibility="" color="" position="0 0 -25" height="200" width="160" rotation= "0 0 0" offsetxy="0 0" active="true">
+    <Button
+        id="xmlSetupButton"
+        color=""
+        active="False"
+        onClick="setupDevice">
+    </Button>
+</Panel>
+
+<Panel id="setupPanel" active="False" visibility="" color="Grey" position="0 -500 -25" height="1000" width="1000" rotation= "0 0 180" offsetxy="0 0" scale="0.4 0.5 0.5" >
+    <VerticalLayout>
+        
+            <Text color="White" fontSize="60"> 
+                Device has not be setup yet. 
+                
+                Press P twice to get to top down view, then space to reset your camera. Use the Zone tool (F3), with the last option for Scripting. Carefully draw the area where you are going to be putting yoru models. After you draw it click on the box to copy its ID. Paste that ID to the below field and Press the Button. Use "F1", "P" and "Spacebar" to reset your view and tools
+            </Text>
+            <InputField id="xmlGUIDInput" onValueChanged="InputValueChanged" fontSize="60" characterLimit="6"/>
+        
+    </VerticalLayout>
+</Panel>

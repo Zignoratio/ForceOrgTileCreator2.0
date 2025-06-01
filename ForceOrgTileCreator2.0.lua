@@ -14,6 +14,8 @@ For more information and variants of this tool, reach out to Raikoh067 on Discor
 ]]--
 
 -----------------
+--Pretend this means the object has not be set up before.
+NEW = true
 
 -- These affect the created tile
 IS_LOCKED = true
@@ -21,10 +23,11 @@ SPAWNED_CARD_SCALE = 6.72 -- ForceOrg Default
 TILE_ROTATION = 180 -- ForceOrg Default
 
 -- Zone Settings
-
+ZONE_POS = nil
+ZONE_SCALE = nil
 
 -- Set default tile art. Default is Space Marine with back.
-cardFront = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399045823/C53CF78B3F4A81500D458DD9A45F8F262ABC6409/" -- Default space marine
+cardFront = "https://steamusercontent-a.akamaihd.net/ugc/14676347933992118556/09D092FEC8D4EE784223D199DED1C5A96EB4CEAC/" -- Default Insructions
 cardBack = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399277771/F36A07139E1E971F5F62C5C5F22677FECFDBE1FB/" -- Black background
 
 -- Put any GUID here you want ignored. This is also passed to the created tile.
@@ -43,7 +46,55 @@ DROP_OFF = nil
 objects = nil
 --------------------
 function onLoad() -- button created in XML right now. Gives options to hid visiblity
+
+    -- Everytnig is defaulted to not be active, so only turning on the elements that make sense
+    if NEW == true then
+        self.UI.setAttribute("panelSetupText", "active", true)    
+        self.UI.setAttribute("xmlSetupButton", "active", true)
+        self.UI.setAttribute("setupPanel", "active", true)
+    else
+        self.UI.setAttribute("panelSaveText", "active", true)    
+        self.UI.setAttribute("xmlSaveButton", "active", true)
+    end
+
 end
+
+function InputValueChanged(_, value, id)
+    self.UI.setAttribute(id, "text", value)
+end
+
+function setupDevice(player, value, id)
+    local zoneGUID = self.UI.getAttribute("xmlGUIDInput", "text")
+    if zoneGUID == nil or zoneGUID =="" then
+        broadcastToAll("Field is empty, please paste the Zone GUID", "Red")
+        return
+    else
+        if getObjectFromGUID(zoneGUID) then
+            local zone = getObjectFromGUID(zoneGUID)
+            ZONE_POS = zone.getPosition()
+            ZONE_SCALE = zone.getScale()
+            print("Zone Position: ", ZONE_POS)
+            ZONE_SCALE.y = ZONE_SCALE.y * 2 -- Makes it fatter
+            zone.destruct()
+
+            --toggle the UI
+            self.UI.setAttribute("panelSaveText", "active", true)    
+            self.UI.setAttribute("xmlSaveButton", "active", true)
+
+            self.UI.setAttribute("panelSetupText", "active", false)    
+            self.UI.setAttribute("xmlSetupButton", "active", false)
+            self.UI.setAttribute("setupPanel", "active", false)
+        else
+            broadcastToAll("Error: No zone with GUID: " .. zoneGUID .. " was found.", "Red")
+            return
+        end
+    end
+
+end
+
+
+
+
 
 --------------------
 function saveModels(player)
@@ -70,8 +121,8 @@ function saveModels(player)
 
     --step1 spawn zone
     spawnObject({
-        position = {x=1.17, y=10, z=12.50},
-        scale = {x=158.19, y=19, z=102.82}, 
+        position = ZONE_POS,
+        scale = ZONE_SCALE, 
         type = 'ScriptingTrigger',
         callback_owner = self,
         callback_function = function(obj)
@@ -212,6 +263,10 @@ function saveModels(player)
             TileCustom.setPosition(Tile_position) -- Set the position of the Tile to the Tile position we set up above
             TileCustom.setRotation({0, TILE_ROTATION, 0}) --^
             Wait.time(function()TileCustom.call("setProtectedTable", {table = IGNORED}) end,.2)
+            Wait.time(function()TileCustom.call("setZonePos", ZONE_POS) end,.2)
+            Wait.time(function()TileCustom.call("setZoneScale", ZONE_SCALE) end,.2)
+            
+
 
         end,
         function()
@@ -242,12 +297,24 @@ function getTileData() -- This fuction prepares the Models Tile data.
     IGNORED = {
             }
     objects = nil
+    -- Zone Settings
+
+    ZONE_POS = nil
+    ZONE_SCALE = nil
 
 IGNORED = {}
 
     -- sets protected objects from the creator
     function setProtectedTable(params)
         IGNORED = params.table
+    end
+
+    function setZonePos(value)
+        ZONE_POS = value
+    end
+
+    function setZoneScale(value)
+        ZONE_SCALE = value
     end
 
     function onLoad()
@@ -322,8 +389,8 @@ IGNORED = {}
 
         --step1
         spawnObject({
-            position = {x=1.17, y=10, z=12.50},
-            scale = {x=158.19, y=19, z=102.82}, 
+            position = ZONE_POS,
+            scale = ZONE_SCALE, 
             type = 'ScriptingTrigger',
             callback_owner = self,
             callback_function = function(obj)
