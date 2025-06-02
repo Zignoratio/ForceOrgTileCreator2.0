@@ -19,7 +19,7 @@ NEW = true
 
 -- These affect the created tile
 IS_LOCKED = true
-SPAWNED_CARD_SCALE = 6.72 -- ForceOrg Default
+SPAWNED_TILE_SCALE = 6.72 -- ForceOrg Default
 TILE_ROTATION = 180 -- ForceOrg Default
 
 -- Zone Settings
@@ -45,8 +45,9 @@ UPDATE_TARGET = nil
 DROP_OFF = nil
 objects = nil
 --------------------
-function onLoad() -- button created in XML right now. Gives options to hid visiblity
+function onLoad(state) -- button created in XML right now. Gives options to hid visiblity
 
+    
     -- Everytnig is defaulted to not be active, so only turning on the elements that make sense
     if NEW == true then
         self.UI.setAttribute("panelSetupText", "active", true)    
@@ -58,6 +59,16 @@ function onLoad() -- button created in XML right now. Gives options to hid visib
     end
 
 end
+
+function onSave()
+    local state = {
+        savedZone = {ZONE_POS, ZONE_SCALE},
+        savedIgnoreGUIDs = IGNORED
+    }
+    return JSON.encode(state)
+end
+
+
 
 function InputValueChanged(_, value, id)
     self.UI.setAttribute(id, "text", value)
@@ -73,7 +84,6 @@ function setupDevice(player, value, id)
             local zone = getObjectFromGUID(zoneGUID)
             ZONE_POS = zone.getPosition()
             ZONE_SCALE = zone.getScale()
-            print("Zone Position: ", ZONE_POS)
             ZONE_SCALE.y = ZONE_SCALE.y * 2 -- Makes it fatter
             zone.destruct()
 
@@ -233,40 +243,19 @@ function saveModels(player)
                 Tile_position = selectedObject.getPosition()
                 info = selectedObject.getCustomObject()
                 cardFront = info.image --updates the image from the default Space Marine to whatever the previous card had for top art.
+                selectedObject.setPosition(DROP_OFF)
+                selectedObject.setLock(false)
             else
-                broadcastToAll("No tile was selected for update. Using tile above, or Space Marine if nothing is there.","Red")
+                broadcastToAll("No tile was selected for update. Using Default Art.\n\nTo Update a tile in place, 1st select the tile with CTRL + Click before hitting","Red")
             end
             
-            -------------------------
-            local objects = Physics.cast({
-                origin = Tile_position,
-                type = 3,
-                direction = { 0, 1.2, 0 },
-                size = { 1, 1, 1 },
-                max_distance = 1,
-                debug = false
-            })
-
-            for _, hit in pairs(objects) do
-                local obj = hit.hit_object
-                if obj.type == "Tile" and obj ~= getObjectFromGUID("8aff1f") then -- 2nd condition excludes the tile base things are attached to, if its there
-                    info = obj.getCustomObject()
-                    cardFront = info.image --updates the image from the default Space Marine to whatever the previous card had for top art.
-                    obj.setPosition(DROP_OFF) -- deposites the card at a pre determined location
-                    obj.setLock(false)
-                end
-            end
-
             local TileData = getTileData()
             TileData.LuaScript = TileData.LuaScript..luaString-- Append the luaString of saved objects we just made to the LuaScript field of the Tile data
             local TileCustom = spawnObjectData({data = TileData})-- Spawn the Tile thats prepared in the getTileData() function
             TileCustom.setPosition(Tile_position) -- Set the position of the Tile to the Tile position we set up above
             TileCustom.setRotation({0, TILE_ROTATION, 0}) --^
             Wait.time(function()TileCustom.call("setProtectedTable", {table = IGNORED}) end,.2)
-            Wait.time(function()TileCustom.call("setZonePos", ZONE_POS) end,.2)
-            Wait.time(function()TileCustom.call("setZoneScale", ZONE_SCALE) end,.2)
-            
-
+            Wait.time(function()TileCustom.call("setZone", {pos = ZONE_POS , scale = ZONE_SCALE}) end,.2)
 
         end,
         function()
@@ -309,12 +298,9 @@ IGNORED = {}
         IGNORED = params.table
     end
 
-    function setZonePos(value)
-        ZONE_POS = value
-    end
-
-    function setZoneScale(value)
-        ZONE_SCALE = value
+    function setZone(params)
+        ZONE_POS = params.pos
+        ZONE_SCALE = params.scale
     end
 
     function onLoad()
@@ -496,9 +482,9 @@ IGNORED = {}
         ]],
         LuaScriptState = "",
         Transform = { --Moved controls to the top of the script for EZ access.
-            scaleX = SPAWNED_CARD_SCALE,
-            scaleY = SPAWNED_CARD_SCALE,
-            scaleZ = SPAWNED_CARD_SCALE
+            scaleX = SPAWNED_TILE_SCALE,
+            scaleY = SPAWNED_TILE_SCALE,
+            scaleZ = SPAWNED_TILE_SCALE
         },
         ColorDiffuse = {0, 0, 0},
         Locked = IS_LOCKED,
