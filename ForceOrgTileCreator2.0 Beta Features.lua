@@ -13,25 +13,12 @@ This is far more efficient for thousands of models.
 For more information and variants of this tool, reach out to Raikoh067 on Discord.
 ]]--
 
------------------
---Pretend this means the object has not be set up before.
-NEW = true
 
--- These affect the created tile
-IS_LOCKED = true
-SPAWNED_TILE_SCALE = 6.72 -- ForceOrg Default
-TILE_ROTATION = 180 -- ForceOrg Default
-
--- Zone Settings
+-- This is the hard coded setup area where we define the model zone and any GUID we want to be ignored by the device
 ZONE_POS = nil
 ZONE_SCALE = nil
 
--- Set default tile art. Default is Space Marine with back.
-cardFront = "https://steamusercontent-a.akamaihd.net/ugc/14676347933992118556/09D092FEC8D4EE784223D199DED1C5A96EB4CEAC/" -- Default Insructions
-cardBack = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399277771/F36A07139E1E971F5F62C5C5F22677FECFDBE1FB/" -- Black background
-
--- Put any GUID here you want ignored. This is also passed to the created tile.
-IGNORED =
+IGNORED_GUIDS =
 {
     "e7ca6e", --Exclude Models Buidler Table
     "6012bf", --...and ForceOrg Table...
@@ -39,40 +26,72 @@ IGNORED =
     "948ce5", --...and FTC Table...
     "28865a", --...and FTC Felt Surface.}
 }
+----- You will need to mirror these values
 
--- Other global variables (updated dynamicly later)
+
+-- These affect the created/updated tile, modify to your preference
+IS_LOCKED = true
+SPAWNED_TILE_SCALE = 6.72 -- 6.72 ForceOrg Default
+TILE_ROTATION = 180 -- 180 ForceOrg Default
+
+-- Set default tile art. CTRL + Clicking a tile before save will update it in place and put the old tile above the device.
+CARD_FRONT = "https://steamusercontent-a.akamaihd.net/ugc/14676347933992118556/09D092FEC8D4EE784223D199DED1C5A96EB4CEAC/" -- Default Insructions
+CARD_BACK = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399277771/F36A07139E1E971F5F62C5C5F22677FECFDBE1FB/" -- Black background
+
+-- Other global variables (updated dynamicly later so dont change here, wouldn't do anything)
 UPDATE_TARGET = nil
 DROP_OFF = nil
 objects = nil
---------------------
-function onLoad(state) -- button created in XML right now. Gives options to hid visiblity
 
+--------------------
+function onLoad(script_state) -- button created in XML right now. Gives options to hid visiblity
     
-    -- Everytnig is defaulted to not be active, so only turning on the elements that make sense
-    if NEW == true then
+    
+    if script_state == '' or script_state == nil then
         self.UI.setAttribute("panelSetupText", "active", true)    
         self.UI.setAttribute("xmlSetupButton", "active", true)
         self.UI.setAttribute("setupPanel", "active", true)
+
+        self.UI.setAttribute("panelSaveText", "active", false)    
+        self.UI.setAttribute("xmlSaveButton", "active", false)
+        self.UI.setAttribute("resetDeviceButton", "active", false)
+       
     else
+        
         self.UI.setAttribute("panelSaveText", "active", true)    
         self.UI.setAttribute("xmlSaveButton", "active", true)
-    end
+        self.UI.setAttribute("resetDeviceButton", "active", true)
 
+        self.UI.setAttribute("panelSetupText", "active", false)    
+        self.UI.setAttribute("xmlSetupButton", "active", false)
+        self.UI.setAttribute("setupPanel", "active", false)
+
+        local state = JSON.decode(script_state)
+        ZONE_POS = state.savedZONE_POS
+        ZONE_SCALE = state.savedZONE_SCALE
+        IGNORED_GUIDS = state.savedIGNORED_GUIDS
+    end
 end
 
 function onSave()
     local state = {
-        savedZone = {ZONE_POS, ZONE_SCALE},
-        savedIgnoreGUIDs = IGNORED
+        savedZonePos = ZONE_POS,
+        savedZoneScale = ZONE_SCALE,
+        savedIgnoreGUIDs = IGNORED_GUIDS
     }
     return JSON.encode(state)
 end
 
+function resetDevice()
+    self.script_state = ""
+    onLoad("")
+end
 
 
 function InputValueChanged(_, value, id)
     self.UI.setAttribute(id, "text", value)
 end
+
 
 function setupDevice(player, value, id)
     local zoneGUID = self.UI.getAttribute("xmlGUIDInput", "text")
@@ -87,13 +106,17 @@ function setupDevice(player, value, id)
             ZONE_SCALE.y = ZONE_SCALE.y * 2 -- Makes it fatter
             zone.destruct()
 
-            --toggle the UI
-            self.UI.setAttribute("panelSaveText", "active", true)    
-            self.UI.setAttribute("xmlSaveButton", "active", true)
+            
 
-            self.UI.setAttribute("panelSetupText", "active", false)    
-            self.UI.setAttribute("xmlSetupButton", "active", false)
-            self.UI.setAttribute("setupPanel", "active", false)
+            --toggle the UI
+        self.UI.setAttribute("panelSaveText", "active", true)    
+        self.UI.setAttribute("xmlSaveButton", "active", true)
+        self.UI.setAttribute("resetDeviceButton", "active", true)
+
+        self.UI.setAttribute("panelSetupText", "active", false)    
+        self.UI.setAttribute("xmlSetupButton", "active", false)
+        self.UI.setAttribute("setupPanel", "active", false)
+
         else
             broadcastToAll("Error: No zone with GUID: " .. zoneGUID .. " was found.", "Red")
             return
@@ -102,10 +125,6 @@ function setupDevice(player, value, id)
 
 end
 
-
-
-
-
 --------------------
 function saveModels(player)
 
@@ -113,9 +132,14 @@ function saveModels(player)
     DROP_OFF = self.getPosition() + Vector(0, 0, 12)  -- Just using offsets now
 
     -- Easier to filter donig this also, making a new filtered list also
-    local IGNORED_SET = {}
-    for _, guid in ipairs(IGNORED) do
-        IGNORED_SET[guid] = true
+    local IGNORED_GUIDS_SET = {}
+    
+    if not IGNORED_GUIDS then
+        broadcastToAll("Nothing in the Ignore GUIDs list", "White")
+    else
+        for _, guid in ipairs(IGNORED_GUIDS) do
+            IGNORED_GUIDS_SET[guid] = true
+        end
     end
 
     local filtered_objects = {}
@@ -175,7 +199,7 @@ function saveModels(player)
     Wait.condition(
         function()
             for _, obj in ipairs(objects) do
-                if not IGNORED_SET[obj.guid] then
+                if not IGNORED_GUIDS_SET[obj.guid] then
                     table.insert(filtered_objects, obj)
                 end
             end
@@ -242,7 +266,7 @@ function saveModels(player)
                 local selectedObject = selection[1]
                 Tile_position = selectedObject.getPosition()
                 info = selectedObject.getCustomObject()
-                cardFront = info.image --updates the image from the default Space Marine to whatever the previous card had for top art.
+                CARD_FRONT = info.image --updates the image from the default Space Marine to whatever the previous card had for top art.
                 selectedObject.setPosition(DROP_OFF)
                 selectedObject.setLock(false)
             else
@@ -254,7 +278,7 @@ function saveModels(player)
             local TileCustom = spawnObjectData({data = TileData})-- Spawn the Tile thats prepared in the getTileData() function
             TileCustom.setPosition(Tile_position) -- Set the position of the Tile to the Tile position we set up above
             TileCustom.setRotation({0, TILE_ROTATION, 0}) --^
-            Wait.time(function()TileCustom.call("setProtectedTable", {table = IGNORED}) end,.2)
+            Wait.time(function()TileCustom.call("setProtectedTable", {table = IGNORED_GUIDS}) end,.2)
             Wait.time(function()TileCustom.call("setZone", {pos = ZONE_POS , scale = ZONE_SCALE}) end,.2)
 
         end,
@@ -272,8 +296,8 @@ function getTileData() -- This fuction prepares the Models Tile data.
         Description = "",
         GMNotes = self.getGMNotes(),
         CustomImage = {
-            ImageURL = cardFront,
-            ImageSecondaryURL = cardBack,
+            ImageURL = CARD_FRONT,
+            ImageSecondaryURL = CARD_BACK,
             ImageScalar = 1.0,
             WidthScale = 0.0,
             CustomTile = {
@@ -283,7 +307,7 @@ function getTileData() -- This fuction prepares the Models Tile data.
             }
         },
         LuaScript = [[
-    IGNORED = {
+    IGNORED_GUIDS = {
             }
     objects = nil
     -- Zone Settings
@@ -291,11 +315,11 @@ function getTileData() -- This fuction prepares the Models Tile data.
     ZONE_POS = nil
     ZONE_SCALE = nil
 
-IGNORED = {}
+    IGNORED_GUIDS = {}
 
     -- sets protected objects from the creator
     function setProtectedTable(params)
-        IGNORED = params.table
+        IGNORED_GUIDS = params.table
     end
 
     function setZone(params)
@@ -358,9 +382,9 @@ IGNORED = {}
         -------------------
 
         -- Easier to filter donig this also, making a new filtered list also
-        local IGNORED_SET = {}
-        for _, guid in ipairs(IGNORED) do
-            IGNORED_SET[guid] = true
+        local IGNORED_GUIDS_SET = {}
+        for _, guid in ipairs(IGNORED_GUIDS) do
+            IGNORED_GUIDS_SET[guid] = true
         end
 
         local filtered_objects = {}
@@ -418,7 +442,7 @@ IGNORED = {}
         Wait.condition(
             function()
                 for _, obj in ipairs(objects) do
-                    if not IGNORED_SET[obj.guid] then
+                    if not IGNORED_GUIDS_SET[obj.guid] then
                         table.insert(filtered_objects, obj)
                     end
                 end
