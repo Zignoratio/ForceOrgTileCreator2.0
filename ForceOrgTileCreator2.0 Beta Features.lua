@@ -13,12 +13,12 @@ This is far more efficient for thousands of models.
 For more information and variants of this tool, reach out to Raikoh067 on Discord.
 ]]--
 
+--Variable declairations
+local ZONE_POS
+local ZONE_SCALE
 
--- This is the hard coded setup area where we define the model zone and any GUID we want to be ignored by the device
-ZONE_POS = nil
-ZONE_SCALE = nil
-
-IGNORED_GUIDS =
+--Manual Exclusions, when you set up the zon
+local IGNORED_GUIDS =
 {
     "e7ca6e", --Exclude Models Buidler Table
     "6012bf", --...and ForceOrg Table...
@@ -26,28 +26,35 @@ IGNORED_GUIDS =
     "948ce5", --...and FTC Table...
     "28865a", --...and FTC Felt Surface.}
 }
------ You will need to mirror these values
-
 
 -- These affect the created/updated tile, modify to your preference
-IS_LOCKED = true
-SPAWNED_TILE_SCALE = 6.72 -- 6.72 ForceOrg Default
-TILE_ROTATION = 180 -- 180 ForceOrg Default
+local IS_LOCKED = true
+local SPAWNED_TILE_SCALE = 6.72 -- 6.72 ForceOrg Default
+local TILE_ROTATION = 180 -- 180 ForceOrg Default
 
 -- Set default tile art. CTRL + Clicking a tile before save will update it in place and put the old tile above the device.
-CARD_FRONT = "https://steamusercontent-a.akamaihd.net/ugc/14676347933992118556/09D092FEC8D4EE784223D199DED1C5A96EB4CEAC/" -- Default Insructions
-CARD_BACK = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399277771/F36A07139E1E971F5F62C5C5F22677FECFDBE1FB/" -- Black background
+local CARD_FRONT = "https://steamusercontent-a.akamaihd.net/ugc/14676347933992118556/09D092FEC8D4EE784223D199DED1C5A96EB4CEAC/" -- Default Insructions
+local CARD_BACK = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399277771/F36A07139E1E971F5F62C5C5F22677FECFDBE1FB/" -- Black background
 
--- Other global variables (updated dynamicly later so dont change here, wouldn't do anything)
-UPDATE_TARGET = nil
-DROP_OFF = nil
-OBJECTS = nil
+-- Other variables (updated dynamicly later so dont change here, wouldn't do anything)
+local UPDATE_TARGET
+local DROP_OFF
+local OBJECTS
 
---------------------
-function onLoad(script_state) -- button created in XML right now. Gives options to hid visiblity
+
+-- FUNCTIONS BEYOND THIS POINT
+
+-- Reset button id: resetDeviceButton
+function resetDevice()
+    ZONE_POS = nil
+    ZONE_SCALE = nil
+    script_state = ""
+    onLoad('')
+end
+
+function onLoad(script_state)
     
-    
-    if script_state == '' or script_state == nil then
+    if not script_state.ZONE_POS then
         self.UI.setAttribute("panelSetupText", "active", true)    
         self.UI.setAttribute("xmlSetupButton", "active", true)
         self.UI.setAttribute("setupPanel", "active", true)
@@ -57,7 +64,6 @@ function onLoad(script_state) -- button created in XML right now. Gives options 
         self.UI.setAttribute("resetDeviceButton", "active", false)
        
     else
-        
         self.UI.setAttribute("panelSaveText", "active", true)    
         self.UI.setAttribute("xmlSaveButton", "active", true)
         self.UI.setAttribute("resetDeviceButton", "active", true)
@@ -73,25 +79,22 @@ function onLoad(script_state) -- button created in XML right now. Gives options 
     end
 end
 
+--
 function onSave()
+    
     local state = {
-        savedZonePos = ZONE_POS,
-        savedZoneScale = ZONE_SCALE,
-        savedIgnoreGUIDs = IGNORED_GUIDS
+        savedZONE_POS = ZONE_POS,
+        savedZONE_SCALE = ZONE_SCALE,
+        ssavedIGNORED_GUIDS = IGNORED_GUIDS
     }
     return JSON.encode(state)
+
 end
 
-function resetDevice()
-    self.script_state = ""
-    onLoad("")
-end
-
-
+-- Needed to update the field when text is input for the Zone GUID
 function InputValueChanged(_, value, id)
     self.UI.setAttribute(id, "text", value)
 end
-
 
 function setupDevice(player, value, id)
     local zoneGUID = self.UI.getAttribute("xmlGUIDInput", "text")
@@ -106,16 +109,110 @@ function setupDevice(player, value, id)
             ZONE_SCALE.y = ZONE_SCALE.y * 2 -- Makes it fatter
             zone.destruct()
 
-            
-
             --toggle the UI
-        self.UI.setAttribute("panelSaveText", "active", true)    
-        self.UI.setAttribute("xmlSaveButton", "active", true)
-        self.UI.setAttribute("resetDeviceButton", "active", true)
+            self.UI.setAttribute("panelSaveText", "active", true)    
+            self.UI.setAttribute("xmlSaveButton", "active", true)
+            self.UI.setAttribute("resetDeviceButton", "active", true)
 
-        self.UI.setAttribute("panelSetupText", "active", false)    
-        self.UI.setAttribute("xmlSetupButton", "active", false)
-        self.UI.setAttribute("setupPanel", "active", false)
+            self.UI.setAttribute("panelSetupText", "active", false)    
+            self.UI.setAttribute("xmlSetupButton", "active", false)
+            self.UI.setAttribute("setupPanel", "active", false)
+
+            -- Easier to filter donig this also, making a new filtered list also
+            local IGNORED_GUIDS_SET = {}
+
+            if IGNORED_GUIDS then
+                for _, guid in ipairs(IGNORED_GUIDS) do
+                    IGNORED_GUIDS_SET[guid] = true
+                end
+            end
+
+            local filtered_objects = {}
+
+
+            local step1 = false -- spawn zone
+            local step2 = false -- find zone
+            local step3 = false -- get objects in zone
+            local step4 = false -- filter results
+            local step5 = false -- add GUIDs to Ignore
+            local step6 = false -- destory zone
+
+            --step1 spawn zone
+            spawnObject({
+                position = ZONE_POS,
+                scale = ZONE_SCALE, 
+                type = 'ScriptingTrigger',
+                callback_owner = self,
+                callback_function = function(obj)
+                    obj.setName("TempZone")
+                end
+            })
+
+            Wait.time(function() step1 = true end,.1) -- small delay to kick this off.
+
+            --step2 find zone
+            Wait.condition( 
+                function()
+                    for _,o in ipairs(getObjects()) do
+                        if o.type == "Scripting" then
+                            if o.getName() == "TempZone" then
+                                zone = o
+                                step2 = true
+                                break
+                            end
+                        end
+                    end
+                end,
+                function()
+                    return step1 == true
+                end, 20
+            )
+
+            --step3 get objects in zone
+            Wait.condition(
+                function()
+                    OBJECTS = zone.getObjects()
+                    step3 = true
+                end,
+                function()
+                    return step2 == true
+                end, 20
+            )
+
+
+            --step4 filter results
+            Wait.condition(
+                function()
+                    for _, obj in ipairs(OBJECTS) do
+                        if not IGNORED_GUIDS_SET[obj.guid] then
+                            table.insert(filtered_objects, obj)
+                            
+                        end
+                    end
+                    step4 = true
+                end,
+                function()
+                    return step3 == true
+                end, 20
+            )
+
+            --step5 encode to JSON
+            Wait.condition(
+                function()
+                    for i, obj in ipairs(filtered_objects) do
+                        table.insert(IGNORED_GUIDS, obj.guid)
+                        broadcastToAll("Adding GUID: " .. obj.guid .. " to the list of objects to ignore","Green")
+                        if i == #filtered_objects then step5 = true end
+                    end
+                end,
+                function()
+                    return step4 == true
+                end, 20
+            )
+
+            --step6
+            Wait.condition(function() zone.destruct() step5 = true end, function() return step4 == true end, 20)
+
 
         else
             broadcastToAll("Error: No zone with GUID: " .. zoneGUID .. " was found.", "Red")
@@ -280,7 +377,6 @@ function saveModels(player)
             TileCustom.setRotation({0, TILE_ROTATION, 0}) --^
             Wait.time(function()TileCustom.call("setProtectedTable", {table = IGNORED_GUIDS}) end,.2)
             Wait.time(function()TileCustom.call("setZone", {pos = ZONE_POS , scale = ZONE_SCALE}) end,.2)
-
         end,
         function()
             return step6 == true
