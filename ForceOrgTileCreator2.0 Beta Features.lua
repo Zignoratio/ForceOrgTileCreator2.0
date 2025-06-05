@@ -41,7 +41,7 @@ CARD_BACK = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399277771/F36
 -- Other global variables (updated dynamicly later so dont change here, wouldn't do anything)
 UPDATE_TARGET = nil
 DROP_OFF = nil
-objects = nil
+OBJECTS = nil
 
 --------------------
 function onLoad(script_state) -- button created in XML right now. Gives options to hid visiblity
@@ -187,7 +187,7 @@ function saveModels(player)
     --step3 get objects in zone
     Wait.condition(
         function()
-            objects = zone.getObjects()
+            OBJECTS = zone.getObjects()
             step3 = true
         end,
         function()
@@ -198,7 +198,7 @@ function saveModels(player)
     --step4 filter results
     Wait.condition(
         function()
-            for _, obj in ipairs(objects) do
+            for _, obj in ipairs(OBJECTS) do
                 if not IGNORED_GUIDS_SET[obj.guid] then
                     table.insert(filtered_objects, obj)
                 end
@@ -309,7 +309,7 @@ function getTileData() -- This fuction prepares the Models Tile data.
         LuaScript = [[
     IGNORED_GUIDS = {
             }
-    objects = nil
+    OBJECTS = nil
     -- Zone Settings
 
     ZONE_POS = nil
@@ -430,7 +430,7 @@ function getTileData() -- This fuction prepares the Models Tile data.
         --step3
         Wait.condition(
             function()
-                objects = zone.getObjects()
+                OBJECTS = zone.getObjects()
                 step3 = true
             end,
             function()
@@ -441,7 +441,7 @@ function getTileData() -- This fuction prepares the Models Tile data.
         --step4
         Wait.condition(
             function()
-                for _, obj in ipairs(objects) do
+                for _, obj in ipairs(OBJECTS) do
                     if not IGNORED_GUIDS_SET[obj.guid] then
                         table.insert(filtered_objects, obj)
                     end
