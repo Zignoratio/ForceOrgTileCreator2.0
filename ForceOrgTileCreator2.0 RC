@@ -18,7 +18,7 @@ local ZONE_POS
 local ZONE_SCALE
 
 --Manual Exclusions, when you set up the zon
-IGNORED_GUIDS = {}
+local IGNORED_GUIDS = {}
 
 -- These affect the created/updated tile, modify to your preference
 local IS_LOCKED = true
@@ -375,6 +375,7 @@ function saveModels(player)
             TileCustom.setRotation({0, TILE_ROTATION, 0}) --^
             Wait.time(function()TileCustom.call("setProtectedTable", {table = IGNORED_GUIDS}) end,.2)
             Wait.time(function()TileCustom.call("setZone", {pos = ZONE_POS , scale = ZONE_SCALE}) end,.2)
+            
         end,
         function()
             return step6 == true
@@ -401,19 +402,17 @@ function getTileData() -- This fuction prepares the Models Tile data.
             }
         },
         LuaScript = [[
-    IGNORED_GUIDS = {
-            }
+    
     OBJECTS = nil
     -- Zone Settings
-
-    ZONE_POS = nil
+    localZONE_POS = nil
     ZONE_SCALE = nil
-
     IGNORED_GUIDS = {}
 
     -- sets protected objects from the creator
     function setProtectedTable(params)
         IGNORED_GUIDS = params.table
+        print("happened")
     end
 
     function setZone(params)
@@ -458,7 +457,7 @@ function getTileData() -- This fuction prepares the Models Tile data.
     local state = {
         savedZONE_POS = ZONE_POS,
         savedZONE_SCALE = ZONE_SCALE,
-        ssavedIGNORED_GUIDS = IGNORED_GUIDS
+        savedIGNORED_GUIDS = IGNORED_GUIDS
     }
     return JSON.encode(state)
 
