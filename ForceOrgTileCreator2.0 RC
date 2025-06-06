@@ -22,7 +22,7 @@ IGNORED_GUIDS = {}
 
 -- These affect the created/updated tile, modify to your preference
 local IS_LOCKED = true
-local SPAWNED_TILE_SCALE = 1 -- 6.72 ForceOrg Default
+local SPAWNED_TILE_SCALE = 6.72 -- 6.72 ForceOrg Default
 local TILE_ROTATION = 180 -- 180 ForceOrg Default
 
 -- Set default tile art. CTRL + Clicking a tile before save will update it in place and put the old tile above the device.
