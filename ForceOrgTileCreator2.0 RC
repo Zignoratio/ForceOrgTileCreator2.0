@@ -18,18 +18,11 @@ local ZONE_POS
 local ZONE_SCALE
 
 --Manual Exclusions, when you set up the zon
-local IGNORED_GUIDS =
-{
-    "e7ca6e", --Exclude Models Buidler Table
-    "6012bf", --...and ForceOrg Table...
-    "4ee1f2", --...and FTC board matObjSurface...
-    "948ce5", --...and FTC Table...
-    "28865a", --...and FTC Felt Surface.}
-}
+IGNORED_GUIDS = {}
 
 -- These affect the created/updated tile, modify to your preference
 local IS_LOCKED = true
-local SPAWNED_TILE_SCALE = 6.72 -- 6.72 ForceOrg Default
+local SPAWNED_TILE_SCALE = 1 -- 6.72 ForceOrg Default
 local TILE_ROTATION = 180 -- 180 ForceOrg Default
 
 -- Set default tile art. CTRL + Clicking a tile before save will update it in place and put the old tile above the device.
@@ -48,13 +41,18 @@ local OBJECTS
 function resetDevice()
     ZONE_POS = nil
     ZONE_SCALE = nil
+    IGNORED_GUID = nil
     script_state = ""
     onLoad('')
 end
 
 function onLoad(script_state)
-    
-    if not script_state.ZONE_POS then
+    local state = {}
+    if script_state ~= "" then
+        state = JSON.decode(script_state)
+    end
+
+    if not state.savedZONE_POS then
         self.UI.setAttribute("panelSetupText", "active", true)    
         self.UI.setAttribute("xmlSetupButton", "active", true)
         self.UI.setAttribute("setupPanel", "active", true)
@@ -72,7 +70,7 @@ function onLoad(script_state)
         self.UI.setAttribute("xmlSetupButton", "active", false)
         self.UI.setAttribute("setupPanel", "active", false)
 
-        local state = JSON.decode(script_state)
+
         ZONE_POS = state.savedZONE_POS
         ZONE_SCALE = state.savedZONE_SCALE
         IGNORED_GUIDS = state.savedIGNORED_GUIDS
@@ -85,7 +83,7 @@ function onSave()
     local state = {
         savedZONE_POS = ZONE_POS,
         savedZONE_SCALE = ZONE_SCALE,
-        ssavedIGNORED_GUIDS = IGNORED_GUIDS
+        savedIGNORED_GUIDS = IGNORED_GUIDS
     }
     return JSON.encode(state)
 
@@ -423,7 +421,7 @@ function getTileData() -- This fuction prepares the Models Tile data.
         ZONE_SCALE = params.scale
     end
 
-    function onLoad()
+    function onLoad(script_state)
 
         self.createButton({
             label = "Load Models",
@@ -440,23 +438,30 @@ function getTileData() -- This fuction prepares the Models Tile data.
             click_function = "loadModels",
             function_owner = self,
         })	
+        
+        local state = {}
+        if script_state ~= "" then
+            state = JSON.decode(script_state)
+        end
+
+        if state.savedZONE_POS then
+            ZONE_POS = state.savedZONE_POS
+            ZONE_SCALE = state.savedZONE_SCALE
+            IGNORED_GUIDS = state.savedIGNORED_GUIDS
+        end
+
+
+    end
+
+    function onSave()
     
-        -----------------
-        -- Create a Clear Zone button on the Tile
-        -- THIS FUNCTION IS CURRENTLY DISABLED
-        --self.createButton({
-            --label = "Pack Up",
-            --font_size = 100,
-            --color = {.8, 0, 0},
-            --font_color = {0, 0, 0},
-            --position = {0, .5, 1.25},
-            --rotation = {0, 0, 0},
-            --scale = {.7, .7, .6},
-            --width = 440,
-            --height = 110,                        
-            --click_function = "clearzone",
-            --function_owner = self,
-        --})
+    local state = {
+        savedZONE_POS = ZONE_POS,
+        savedZONE_SCALE = ZONE_SCALE,
+        ssavedIGNORED_GUIDS = IGNORED_GUIDS
+    }
+    return JSON.encode(state)
+
     end
     
     -------------------
@@ -479,10 +484,11 @@ function getTileData() -- This fuction prepares the Models Tile data.
 
         -- Easier to filter donig this also, making a new filtered list also
         local IGNORED_GUIDS_SET = {}
-        for _, guid in ipairs(IGNORED_GUIDS) do
-            IGNORED_GUIDS_SET[guid] = true
+        if IGNORED_GUIDS then
+            for _, guid in ipairs(IGNORED_GUIDS) do
+                IGNORED_GUIDS_SET[guid] = true
+            end
         end
-
         local filtered_objects = {}
 
         local step1 = false -- spawn zone
