@@ -412,7 +412,6 @@ function getTileData() -- This fuction prepares the Models Tile data.
     -- sets protected objects from the creator
     function setProtectedTable(params)
         IGNORED_GUIDS = params.table
-        print("happened")
     end
 
     function setZone(params)
