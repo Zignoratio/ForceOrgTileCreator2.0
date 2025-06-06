@@ -364,6 +364,21 @@ function saveModels(player)
                 CARD_FRONT = info.image --updates the image from the default Space Marine to whatever the previous card had for top art.
                 selectedObject.setPosition(DROP_OFF)
                 selectedObject.setLock(false)
+                
+                local decalURL = "https://steamusercontent-a.akamaihd.net/ugc/12796410654061984744/A34F661D9E031D02A5371835C793A7892B575ED0/"  -- OLD 
+
+                -- Create decal parameters
+                local decalParams = {
+                    name = "Custom Decal",
+                    url = decalURL,
+                    position = {0, .2, 0},   -- Slightly above the object surface
+                    rotation = {90, 0, 180},    -- Facing down onto the object
+                    scale = {1, 1, 1},        -- Adjust size as needed
+                }
+
+                -- Apply the decal
+                selectedObject.addDecal(decalParams)
+
             else
                 broadcastToAll("No tile was selected for update. Using Default Art.\nTo Update a tile, select via CTRL + Click it before hitting SAVE","Red")
             end
