@@ -309,7 +309,7 @@ function saveModels(player)
     Wait.condition(
         function()
             if #filtered_objects == 0 then 
-                broadcastToAll("0 Objecets detected. Stopping Operation","Red")
+                broadcastToAll("0 Objects detected. Stopping Operation","Red")
                 zone.destruct()
             else
                 broadcastToAll("Saving " .. #filtered_objects .. " Objects.","Green")
@@ -365,7 +365,7 @@ function saveModels(player)
                 selectedObject.setPosition(DROP_OFF)
                 selectedObject.setLock(false)
             else
-                broadcastToAll("No tile was selected for update. Using Default Art.\n\nTo Update a tile in place, 1st select the tile with CTRL + Click before hitting","Red")
+                broadcastToAll("No tile was selected for update. Using Default Art.\nTo Update a tile, select via CTRL + Click it before hitting SAVE","Red")
             end
             
             local TileData = getTileData()
