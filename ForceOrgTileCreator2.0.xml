@@ -1,9 +1,14 @@
+<Defaults>
+    <Text color="White"/>
+</Defaults>
+
 <Panel visibility="" color="" position="0 -70 -11" height="120" width="250" rotation= "0 0 180" offsetxy="0 0" active="true" scale="0.5 0.5 .5" >
   <VerticalLayout>
     <Text position="0 0 0" id="panelSaveText" active="False" color="#006400" fontSize="85" fontStyle="Bold" alignment="MiddleCenter" text="SAVE"/>
   </VerticalLayout>
 </Panel>
-<Panel visibility="" color="" position="0 0 -25" height="200" width="160" rotation= "0 0 0" offsetxy="0 0" active="true">
+
+<Panel visibility="" color="" position="0 0 -25" height="120" width="120" rotation= "0 0 0" offsetxy="0 10" active="true">
     <Button
         id="xmlSaveButton"
         color=""
@@ -17,7 +22,8 @@
     <Text position="0 0 0" id="panelSetupText" active="False" color="#8B0000" fontSize="55" fontStyle="Bold" alignment="MiddleCenter" text="SETUP"/>
   </VerticalLayout>
 </Panel>
-<Panel visibility="" color="" position="0 0 -25" height="200" width="160" rotation= "0 0 0" offsetxy="0 0" active="true">
+
+<Panel visibility="" color="" position="0 0 -25" height="120" width="120" rotation= "0 0 0" offsetxy="0 10" active="true">
     <Button
         id="xmlSetupButton"
         color=""
@@ -26,19 +32,62 @@
     </Button>
 </Panel>
 
-<Panel id="setupPanel" active="False" visibility="" color="Grey" position="0 -500 -25" height="1000" width="1000" rotation= "0 0 180" offsetxy="0 0" scale="0.5 0.5 0.5" >
-    <VerticalLayout>
-        
-            <Text color="White" fontSize="60"> 
-                Device has not be setup yet. 
-                
-                Press P twice to get to top down view, then space to reset your camera. Use the Zone tool (F3), with the last option for Scripting. Carefully draw the area where you are going to be putting yoru models. After you draw it click on the box to copy its ID. Paste that ID to the below field and Press the Button. Use "F1", "P" and "Spacebar" to reset your view and tools
-            </Text>
-            <InputField id="xmlGUIDInput" onValueChanged="InputValueChanged" fontSize="60" characterLimit="6"/>
-        
-    </VerticalLayout>
-</Panel>
+<Panel id="setupPanel" active="False" visibility="" color="Black" position="0 -500 -25" height="1020" width="1020" rotation= "0 0 180" offsetxy="0 0" scale="0.5 0.5 0.5" >
+  <Panel id="" active="True" visibility="" color="#415357" height="1000" width="1000" position="0 0 -5">
+    <VerticalLayout childForceExpandHeight="true" childAlignment="UpperCenter" padding="20 20 20 20">
 
+      <!-- Top Title Text -->
+      <Text fontSize="50" alignment="UpperMiddle">
+        Device / Model Zone Setup
+      </Text>
+
+      <!-- Instruction Text -->
+      <Text fontSize="40" alignment="UpperLeft">
+        1. Press P until in "Top Down" view, then spacebar to reset view.
+
+        2. Select the Scripting Zone Tool. (The Tool on F3, the last option "Scripting") 
+
+        3. Draw the area you want to use for your models.
+
+        4. Click on the Zone to copy its GUID to your clipboard and paste that into the field.
+
+        5. Press the button on the device. Anything detected in the zone will be auto ignored.
+      </Text>
+
+      <!-- Spacer to push below content down -->
+      <Panel flexibleHeight="true" />
+
+      <!-- Bottom Row: Input + Toggle -->
+      <HorizontalLayout preferredHeight="50" childForceExpandWidth="true" spacing="10">
+
+        <!-- InputField on the left -->
+        <InputField 
+          id="xmlGUIDInput"
+          textAlignment="MiddleCenter" 
+          onValueChanged="InputValueChanged" 
+          fontSize="60" 
+          characterLimit="6" 
+          preferredWidth="240" 
+          preferredHeight="60" text="GUID?"/>
+
+        <!-- Spacer to push toggle group to the far right -->
+        <Panel flexibleWidth="true" />
+
+        <!-- Toggle with label -->
+        <HorizontalLayout childForceExpandWidth="false" spacing="10">
+          <Toggle 
+            isOn="true" 
+            preferredWidth="60" 
+            preferredHeight="60" scale="3 3 3" />
+            
+          <Text alignment="MiddleLeft" fontSize="50">Spawn Clear Button</Text>
+        </HorizontalLayout>
+
+      </HorizontalLayout>
+
+    </VerticalLayout>
+  </Panel>
+</Panel>
 
 <Panel visibility="" color="" position="0 90 -11" height="20" width="50" rotation= "0 0 180" offsetxy="0 0" active="true">
     <Button
