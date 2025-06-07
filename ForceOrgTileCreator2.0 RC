@@ -21,7 +21,7 @@ local ZONE_SCALE
 local IGNORED_GUIDS = {}
 
 -- These affect the created/updated tile, modify to your preference
-local IS_LOCKED = true
+local IS_LOCKED = false --this doesnt really do anyting ATM
 local SPAWNED_TILE_SCALE = 6.72 -- 6.72 ForceOrg Default
 local TILE_ROTATION = 180 -- 180 ForceOrg Default
 
@@ -33,7 +33,6 @@ local CARD_BACK = "https://steamusercontent-a.akamaihd.net/ugc/22985887773992777
 local UPDATE_TARGET
 local DROP_OFF
 local OBJECTS
-
 
 -- FUNCTIONS BEYOND THIS POINT
 
@@ -52,6 +51,7 @@ function onLoad(script_state)
         state = JSON.decode(script_state)
     end
 
+    -- Sets all the XML elements depending on the data status.
     if not state.savedZONE_POS then
         self.UI.setAttribute("panelSetupText", "active", true)    
         self.UI.setAttribute("xmlSetupButton", "active", true)
@@ -70,7 +70,7 @@ function onLoad(script_state)
         self.UI.setAttribute("xmlSetupButton", "active", false)
         self.UI.setAttribute("setupPanel", "active", false)
 
-
+        --Loads the data passed by the save state.
         ZONE_POS = state.savedZONE_POS
         ZONE_SCALE = state.savedZONE_SCALE
         IGNORED_GUIDS = state.savedIGNORED_GUIDS
@@ -80,6 +80,7 @@ end
 --
 function onSave()
     
+    -- Passes the values back to the state to get encoded for nexts load.
     local state = {
         savedZONE_POS = ZONE_POS,
         savedZONE_SCALE = ZONE_SCALE,
@@ -224,7 +225,7 @@ end
 function saveModels(player)
 
     UPDATE_TARGET = self.getPosition() + Vector(0, 0, 12) -- Just using offsets now 
-    DROP_OFF = self.getPosition() + Vector(0, 0, 12)  -- Just using offsets now
+    DROP_OFF = self.getPosition() + Vector(0, 2, 12)  -- Just using offsets now
 
     -- Easier to filter donig this also, making a new filtered list also
     local IGNORED_GUIDS_SET = {}

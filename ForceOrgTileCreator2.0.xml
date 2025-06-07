@@ -1,6 +1,6 @@
-<Panel visibility="" color="" position="0 -110 -25" height="150" width="250" rotation= "0 0 180" offsetxy="0 0" active="true" scale="0.5 0.5 .5" >
+<Panel visibility="" color="" position="0 -70 -11" height="120" width="250" rotation= "0 0 180" offsetxy="0 0" active="true" scale="0.5 0.5 .5" >
   <VerticalLayout>
-    <Text position="0 0 0" id="panelSaveText" active="False" color="#006400" fontSize="90" fontStyle="Bold" alignment="MiddleCenter" text="SAVE"/>
+    <Text position="0 0 0" id="panelSaveText" active="False" color="#006400" fontSize="85" fontStyle="Bold" alignment="MiddleCenter" text="SAVE"/>
   </VerticalLayout>
 </Panel>
 <Panel visibility="" color="" position="0 0 -25" height="200" width="160" rotation= "0 0 0" offsetxy="0 0" active="true">
@@ -12,7 +12,7 @@
     </Button>
 </Panel>
 
-<Panel visibility="" color="" position="0 -110 -25" height="150" width="250" rotation= "0 0 180" offsetxy="0 0" active="true" scale="0.5 0.5 0.5" >
+<Panel visibility="" color="" position="0 -70 -11" height="120" width="250" rotation= "0 0 180" offsetxy="0 0" active="true" scale="0.5 0.5 0.5" >
   <VerticalLayout>
     <Text position="0 0 0" id="panelSetupText" active="False" color="#8B0000" fontSize="55" fontStyle="Bold" alignment="MiddleCenter" text="SETUP"/>
   </VerticalLayout>
@@ -26,7 +26,7 @@
     </Button>
 </Panel>
 
-<Panel id="setupPanel" active="False" visibility="" color="Grey" position="0 -500 -25" height="1000" width="1000" rotation= "0 0 180" offsetxy="0 0" scale="0.4 0.5 0.5" >
+<Panel id="setupPanel" active="False" visibility="" color="Grey" position="0 -500 -25" height="1000" width="1000" rotation= "0 0 180" offsetxy="0 0" scale="0.5 0.5 0.5" >
     <VerticalLayout>
         
             <Text color="White" fontSize="60"> 
@@ -40,7 +40,7 @@
 </Panel>
 
 
-<Panel visibility="" color="" position="0 135 -25" height="20" width="50" rotation= "0 0 180" offsetxy="0 0" active="true">
+<Panel visibility="" color="" position="0 90 -11" height="20" width="50" rotation= "0 0 180" offsetxy="0 0" active="true">
     <Button
         id="resetDeviceButton"
         color="Red"
