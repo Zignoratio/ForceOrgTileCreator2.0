@@ -1,6 +1,5 @@
 --[[
 ForceOrg Tile Creator Tool 2.0
-
 By Raikoh and Bone White
 Updated by Ziggy Stardust
 
@@ -623,12 +622,11 @@ function setupDevice(player, value, id)
 
 end
 
-
 function spawnClearButton()
 
     local tokenParams = {
         type = "Custom_Token",
-        position = {x = 0, y = 2, z = -10},
+        position = DROP_OFF,
         rotation = {x = 0, y = 180, z = 0},
         sound = false,
         snap_to_grid = false
