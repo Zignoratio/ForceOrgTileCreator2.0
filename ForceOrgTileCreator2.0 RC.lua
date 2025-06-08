@@ -1,5 +1,5 @@
 --[[
-ForceOrg Tile Creator Tool 1.3
+ForceOrg Tile Creator Tool 2.0
 
 By Raikoh and Bone White
 Updated by Ziggy Stardust
@@ -64,7 +64,7 @@ function onLoad(script_state)
     else
         self.UI.setAttribute("panelSaveText", "active", true)    
         self.UI.setAttribute("xmlSaveButton", "active", true)
-        self.UI.setAttribute("resetDeviceButton", "active", true)
+        self.UI.setAttribute("resetDeviceButton", "active", true)   
 
         self.UI.setAttribute("panelSetupText", "active", false)    
         self.UI.setAttribute("xmlSetupButton", "active", false)
