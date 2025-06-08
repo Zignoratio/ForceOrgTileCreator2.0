@@ -26,7 +26,7 @@ local SPAWNED_TILE_SCALE = 6.72 -- 6.72 ForceOrg Default
 local TILE_ROTATION = 180 -- 180 ForceOrg Default
 
 -- Set default tile art. CTRL + Clicking a tile before save will update it in place and put the old tile above the device.
-local CARD_FRONT = "https://steamusercontent-a.akamaihd.net/ugc/18382304424115116368/113166AF3CB5F02AE14670ED4A5242FD905FB38E/" -- Default Insructions
+local CARD_FRONT = "https://steamusercontent-a.akamaihd.net/ugc/16527191290335155675/9EAD260332D2AEEEBB64FEC843D25907745D7FBC/" -- Default Insructions
 local CARD_BACK = "https://steamusercontent-a.akamaihd.net/ugc/2298588777399277771/F36A07139E1E971F5F62C5C5F22677FECFDBE1FB/" -- Black background
 
 -- Reset button id: resetDeviceButton
