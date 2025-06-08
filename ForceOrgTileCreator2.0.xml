@@ -81,7 +81,8 @@
             id="toggleForClearButton" 
             isOn="true" 
             preferredWidth="60" 
-            preferredHeight="60" scale="3 3 3" />
+            preferredHeight="60" scale="3 3 3"
+            onValueChanged="updateToggle" />
             
           <Text alignment="MiddleLeft" fontSize="50">Spawn Clear Button</Text>
         </HorizontalLayout>
